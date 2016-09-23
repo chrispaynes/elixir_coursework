@@ -15,7 +15,7 @@ defmodule CowboyBlog.Mixfile do
   # Type "mix help compile.app" for more information
   # Applications returns a module for working with applications and defining application callbacks
   def application do
-    [applications: [:logger, :cowboy],
+    [applications: [:logger, :cowboy, :earmark],
      mod: {CowboyBlog, []}]
   end
 
@@ -29,6 +29,8 @@ defmodule CowboyBlog.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:cowboy, "1.0.4"}]
+  [ {:cowboy, "1.0.4"},
+    {:earmark, github: "pragdave/earmark"}
+  ]
   end
 end

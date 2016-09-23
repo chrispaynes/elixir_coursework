@@ -18,9 +18,12 @@ defmodule CowboyBlog do
 
    # Run starts the cowboy httpwebserver.
   def run do
-    # routes stores routes and route handler functions
+    # routes stores routes and route handler functions.
+    # /:filename adds pattern matching for root index URL bindings.
     routes = [
-      {"/", CowboyBlog.Handler, []}
+      {"/:filename", CowboyBlog.Handler, []},
+      # :cowboy_static adds file serving capabilities by using the :cowboy_rest module's REST semantics.
+      {"/static/[...]", :cowboy_static, {:priv_dir, :cowboy_blog, "static_files"}}
     ]
 
     # Cowboy_router.compile compile the routes for use by Cowboy.
