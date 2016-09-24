@@ -3,7 +3,7 @@ defmodule CowboyBlog do
 
   # start begins the supervision tree
   def start(_type, _args) do
-    import Supervisor.Spec, warn: false
+    import Supervisor.Spec, warn: true
 
     # chilren stores the workers and child supervisors to be supervised.
     children = [
@@ -21,6 +21,7 @@ defmodule CowboyBlog do
     # routes stores routes and route handler functions.
     # /:filename adds pattern matching for root index URL bindings.
     routes = [
+      {"/", CowboyBlog.Handler, []},
       {"/:filename", CowboyBlog.Handler, []},
       # :cowboy_static adds file serving capabilities by using the :cowboy_rest module's REST semantics.
       {"/static/[...]", :cowboy_static, {:priv_dir, :cowboy_blog, "static_files"}}

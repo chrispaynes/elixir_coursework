@@ -13,25 +13,50 @@ defmodule CowboyBlog.Handler do
     # :cowboy_req.binding returns specified :filename atoms bound to the request.
     {param, req} = :cowboy_req.binding(:filename, req)
 
+    # IO.inspect returns the URL search binding.
     IO.inspect param
 
     {:ok, req} = get_file(method, param, req)
     {:ok, req, state}
   end
 
-  # get_file/3
+  # get_file/3 returns a list a the contents in the "priv/contents/".
+  # folder when an undefined value is requested.
   def get_file("GET", :undefined, req) do
-    headers = [{"content-type", "text/plain"}]
-    body = "No articles exist using"
+    headers = [{"content-type", "text/html"}]
+    # file_lists stores a file listing for the contents inside "priv/contents/".
+    file_lists = File.ls! "priv/contents/"
+    # Content stores the concatenated contents of all files within the "priv/contents".
+    content = print_articles file_lists, ""
     # :cowboy_req.reply sends the response status line headers and body to the client.
-    {:ok, resp} = :cowboy_req.reply(200, headers, body, req)
+    {:ok, resp} = :cowboy_req.reply(200, headers, content, req)
   end
 
+  # get_file/3 reads a file within "priv/contents/"
+  # and parses it from markdown to HTML.
   def get_file("GET", param, req) do
     headers = [{"content-type", "text/html"}]
     {:ok, file} = File.read "priv/contents/" <> param <> ".md"
     body = Earmark.to_html file
     {:ok, resp} = :cowboy_req.reply(200, headers, body, req)
+  end
+
+
+  # print_articles reads a list of files and parses each file to HTML.
+  def print_articles [h|t], index_contents do
+    {:ok, article} = File.read "priv/contents/" <> h
+    sliced = String.slice article, 0, 1000
+    # Marked stores the HTML parsed markdown files
+    marked = Earmark.to_html sliced
+    # File stores the filename minus the file extension.
+    file = Path.rootname(h)
+    more = "<a class='button' href='#{file}'>More</a><hr />"
+    print_articles t, index_contents <> marked <> more
+  end
+
+
+  def print_articles [], index_contents do
+    index_contents
   end
 
   # terminate performs any necessary cleanup of the state.
@@ -42,6 +67,3 @@ defmodule CowboyBlog.Handler do
     :ok
   end
 end
-
-
-
