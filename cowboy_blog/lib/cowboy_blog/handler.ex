@@ -26,10 +26,12 @@ defmodule CowboyBlog.Handler do
     headers = [{"content-type", "text/html"}]
     # file_lists stores a file listing for the contents inside "priv/contents/".
     file_lists = File.ls! "priv/contents/"
+    title = "Cowboy Blog"
     # Content stores the concatenated contents of all files within the "priv/contents".
     content = print_articles file_lists, ""
+    body = EEx.eval_file "priv/themes/index.html.eex", [content: content, title: title]
     # :cowboy_req.reply sends the response status line headers and body to the client.
-    {:ok, resp} = :cowboy_req.reply(200, headers, content, req)
+    {:ok, resp} = :cowboy_req.reply(200, headers, body, req)
   end
 
   # get_file/3 reads a file within "priv/contents/"
@@ -37,7 +39,9 @@ defmodule CowboyBlog.Handler do
   def get_file("GET", param, req) do
     headers = [{"content-type", "text/html"}]
     {:ok, file} = File.read "priv/contents/" <> param <> ".md"
-    body = Earmark.to_html file
+    title = String.capitalize(param) 
+    content = Earmark.to_html file
+    body = EEx.eval_file "priv/themes/index.html.eex", [content: content, title: title]
     {:ok, resp} = :cowboy_req.reply(200, headers, body, req)
   end
 
@@ -46,7 +50,7 @@ defmodule CowboyBlog.Handler do
   def print_articles [h|t], index_contents do
     {:ok, article} = File.read "priv/contents/" <> h
     sliced = String.slice article, 0, 1000
-    # Marked stores the HTML parsed markdown files
+    # Marked stores the HTML parsed markdown files.
     marked = Earmark.to_html sliced
     # File stores the filename minus the file extension.
     file = Path.rootname(h)
