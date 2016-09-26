@@ -44,3 +44,29 @@ Each line in the file describes a single to-do entry:
      %{date: {2016, 12, 20}, title: "Shopping"},
      %{date: {2016, 12, 19}, title: "Movies"}]
  ```
+
+## Compile the App
+ ```
+ 1. mix compile
+ 2. $ iex -S mix
+ 3. iex(1)> ElixirCsv.new("todos.csv")
+
+ output:
+    [%{date: {2016, 12, 19}, title: "Dentist"},
+     %{date: {2016, 12, 20}, title: "Shopping"},
+     %{date: {2016, 12, 19}, title: "Movies"}]
+ ``` 
+
+ ## Test the App
+ ```
+ $ elixir test/elixir_csv_test.exs OR
+ $ mix test
+
+ output:
+  .....
+
+  Finished in 0.1 seconds (0.1s on load, 0.00s on tests)
+  5 tests, 0 failures
+
+  Randomized with seed #n
+ ```

@@ -14,7 +14,7 @@ defmodule ElixirCsv.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :elixir_csv],  mod: {ElixirCsv, []}]
+    [applications: [:logger]]
   end
 
   # Dependencies can be Hex packages:
