@@ -13,9 +13,6 @@ defmodule CowboyBlog.Handler do
     # :cowboy_req.binding returns specified :filename atoms bound to the request.
     {param, req} = :cowboy_req.binding(:filename, req)
 
-    # IO.inspect returns the URL search binding.
-    IO.inspect param
-
     {:ok, req} = get_file(method, param, req)
     {:ok, req, state}
   end
@@ -39,7 +36,6 @@ defmodule CowboyBlog.Handler do
   def body_header do
     file_list = File.ls! "priv/contents/"
     index = write_index(file_list)
-    IO.inspect index
     EEx.eval_file "priv/themes/header.html.eex", [title: "Cowboy Blog", index: index]
   end
 
