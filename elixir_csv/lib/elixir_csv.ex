@@ -15,23 +15,26 @@ defmodule ElixirCsv do
     Supervisor.start_link(children, opts)
   end
 
-  # get_data opens a file and splits it into a list at each each newline.
+  # get_data opens a file and splits the text into a list at each newline.
   def get_data(f) do
     File.stream!(f)
-    |> Stream.map(&String.replace(&1, "\n", ""))
+    |> Stream.map(&(String.trim(&1, "\n")))
     |> Enum.to_list
   end
 
   # split_record splits each record into separate fields.
   def split_record(data) do
-    Stream.map(data, fn(x) -> String.split(x, ",") end)
+    data
+    |> Stream.map(&(String.split(&1, ",")))
     |> Enum.to_list
   end
 
-  # format_date splits the date value into an integer tuple.
+  # format_date splits the date value into a tuple of integers.
   def format_date(date) do
-    String.split(date, "/")
-    |> Enum.map(fn(x) -> String.to_integer(x) end)
+    # Regex.split splits the date string by non-digit values.
+    Regex.split(~r/\D/, date)
+    |> Stream.map(&String.to_integer/1)
+    |> Enum.to_list
     |> List.to_tuple
   end
 
@@ -40,9 +43,7 @@ defmodule ElixirCsv do
     source
     |> get_data
     |> split_record
-    |> Enum.map(fn(x) -> %{:date => format_date(List.first(x)),
-                           :title => List.last(x)}
-                         end)
+    |> Enum.map(&(%{"date" => format_date(List.first(&1)), "title" => List.last(&1)}))
     # Other ways to write the function
     # Enum.map(input, fn(x) -> %{:date => List.first(x), :title => List.last(x)} end)
     # Enum.map(input, &(%{:date => List.first(&1), :title => List.last(&1)}))

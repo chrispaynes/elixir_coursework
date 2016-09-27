@@ -30,6 +30,8 @@ Each line in the file describes a single to-do entry:
    * %{a: 1, b: 2}
  * Pipe Operator
    * "hello" |> String.capitalize
+ * Regex
+   * Regex.split(~r/\D/, date)
  * Stream Module / Lazy Evaluation
  * Strings Module
 

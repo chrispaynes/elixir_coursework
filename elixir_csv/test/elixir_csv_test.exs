@@ -1,5 +1,3 @@
-ExUnit.start
-
 defmodule ElixirCsvTest do
   use ExUnit.Case
   doctest ElixirCsv
@@ -32,4 +30,11 @@ defmodule ElixirCsvTest do
     |> List.first
     |> is_integer == true
   end
+
+  test "create_record creates a list of maps" do
+    assert is_list(create_record("todos.csv")) == true
+    assert create_record("todos.csv")
+      |> List.first |> is_map == true
+  end
+
 end
