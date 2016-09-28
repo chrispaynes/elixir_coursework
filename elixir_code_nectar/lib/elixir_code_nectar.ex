@@ -1,6 +1,5 @@
 defmodule ElixirCodeNectar do
-  alias ElixirCodeNectar.Factorialize
-  alias ElixirCodeNectar.ZipDouble
-
-
+  require ElixirCodeNectar.Factorialize
+  require ElixirCodeNectar.ZipDouble
+  require ElixirCodeNectar.KaprekarsConstant
 end
