@@ -13,11 +13,17 @@
 # factorialize(0) should return 1.
 
 defmodule ElixirCodeNectar.Factorialize do
+  @moduledoc """
+
+  Factorialize
+  """
+  @spec run(non_neg_integer) :: pos_integer
   def run(number) do
     case number do
       # Outputs returns 1 when 0 is passed as an argument.
       0 -> 1
-      # _ matches any value and recursively multiplies one less than the number argument.
+      # _ matches any value and recursively multiplies one
+      # less than the number argument.
       _ -> number * run(number - 1)
     end
   end
@@ -25,6 +31,7 @@ defmodule ElixirCodeNectar.Factorialize do
 
   # Calls non-recursive run2(0) when argument is zero.
   # Calls recursive run2(n) when a non-zero argument is passed.
+  @spec run2(non_neg_integer) :: pos_integer
   def run2(0), do: 1
   def run2(n) when n > 0 do
     n * run2(n - 1)
