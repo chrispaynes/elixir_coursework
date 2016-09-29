@@ -7,7 +7,9 @@ defmodule ElixirCsv.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     test_coverage: [tool: ExCoveralls],
+     preferred_cli_env: ["coveralls": :test]]
   end
 
   # Configuration for the OTP application
@@ -27,6 +29,9 @@ defmodule ElixirCsv.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [{:dialyxir, "~> 0.3.5", only: [:dev]},
+     {:excoveralls, "~> 0.5", only: :test},
+     {:credo, "~> 0.4", only: [:dev, :test]},
+    ]
   end
 end

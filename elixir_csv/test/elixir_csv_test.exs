@@ -36,5 +36,11 @@ defmodule ElixirCsvTest do
     assert create_record("todos.csv")
       |> List.first |> is_map == true
   end
+  test "new() returns ..." do
+    assert new("todos.csv") == [
+      %{"date" => {2016, 12, 19}, "title" => "Dentist"},
+      %{"date" => {2016, 12, 20}, "title" => "Shopping"},
+      %{"date" => {2016, 12, 19}, "title" => "Movies"}]
+   end
 
 end

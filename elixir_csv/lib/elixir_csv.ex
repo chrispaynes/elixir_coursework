@@ -1,4 +1,7 @@
 defmodule ElixirCsv do
+  @moduledoc """
+  """
+
   use Application
 
   # start begins the supervision tree
@@ -43,10 +46,14 @@ defmodule ElixirCsv do
     source
     |> get_data
     |> split_record
-    |> Enum.map(&(%{"date" => format_date(List.first(&1)), "title" => List.last(&1)}))
+    |> Enum.map(&(%{"date" => format_date(List.first(&1)),
+                    "title" => List.last(&1)}))
+
     # Other ways to write the function
-    # Enum.map(input, fn(x) -> %{:date => List.first(x), :title => List.last(x)} end)
-    # Enum.map(input, &(%{:date => List.first(&1), :title => List.last(&1)}))
+    # Enum.map(input, fn(x) -> %{:date => List.first(x),
+                               # :title => List.last(x)} end)
+    # Enum.map(input, &(%{:date => List.first(&1),
+                        # :title => List.last(&1)}))
   end
 
   def new(file) do
