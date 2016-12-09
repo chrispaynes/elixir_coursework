@@ -15,18 +15,30 @@ defmodule ArgumentsOptional do
     If either argument isn't a valid number, return undefined.
   """
 
+  @doc """
+    Sums all integer values from the variable binding keyword list
+  """
   def addTogether(a, b) when is_integer(a) and is_integer(b) do
-    Enum.sum(Keyword.values(binding()))
+    binding |> Keyword.values |> Enum.sum
   end
 
+  @doc """
+    Sums all floats values from the variable binding keyword list
+  """
   def addTogether(a, b) when is_float(a) and is_float(b) do
-    Enum.sum(Keyword.values(binding()))
+    binding |> Keyword.values |> Enum.sum
   end
 
+  @doc """
+    Returns nil for all non_integer and non_float arguments
+  """
   def addTogether(_, _) do
       nil
   end
 
+  @doc """
+    Returns nil for all non_integer and non_float arguments
+  """
   def addTogether(_) do
       nil
   end
