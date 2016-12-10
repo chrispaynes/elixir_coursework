@@ -1,5 +1,6 @@
 defmodule SchizoTest do
   use ExUnit.Case, async: true
+  doctest Schizo
 
   test "uppercase does not change the first word" do
     assert(Schizo.uppercase("foo") == "foo")
