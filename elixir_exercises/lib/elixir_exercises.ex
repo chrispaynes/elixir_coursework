@@ -8,5 +8,6 @@ defmodule ElixirExercises do
   require KaprekarsConstant
   require Factorialize
   require ZipDouble
+  require Schizo
 
 end
