@@ -13,18 +13,19 @@ defmodule Schizo do
     Enum.join(transform_words, " ")
   end
 
-  def uppercaser({word, index}) do
+  def transformer({word, index}, transformation) do
     cond do
       rem(index, 2) == 0 -> word
-      rem(index, 2) == 1 -> String.upcase(word)
+      rem(index, 2) == 1 -> transformation.(word)
     end
   end
 
-  def remove_vowels({word, index}) do
-    cond do
-      rem(index, 2) == 0 -> word
-      rem(index, 2) == 1 -> Regex.replace(~r/a|e|i|o|i|y/, word, "")
-    end
+  def uppercaser(input) do
+    transformer(input, fn(word) -> String.upcase(word) end)
+  end
+
+  def remove_vowels(input) do
+    transformer(input, fn(word) -> Regex.replace(~r/[aeiou]/, word, "") end)
   end
 end
 
