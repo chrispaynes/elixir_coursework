@@ -1,18 +1,14 @@
 defmodule PingTest do
   use ExUnit.Case
 
+  @doc """
+    Spawns the start function, linking it to the current process and returns its pid.
+    Sends ping's process mailbox a message, along with a :pong message and self's PID.
+    Asserts the message {:ping, ping} message pattern was or is going to be received.
+  """
   test "it responds to a 'pong' message with a 'ping' message" do
-    # create spawn a process to run the ping module
-    # starts with :start fn
-    # spawns new process and links it to the current process
-    # when ping process dies, current process will be notified
-    # returns the PID of the spawn process
     ping = spawn_link(Ping, :start, [])
-
-    # send the module a :pong message, and self's PID
-    # process goes into ping processes mailbox
     send ping, {:pong, self}
-
     assert_receive {:ping, ping}
   end
 
@@ -20,7 +16,7 @@ defmodule PingTest do
     ping = spawn_link(Ping, :start, [])
     send ping, {:pong, self}
     assert_receive {:ping, ping}
-    
+
     ping = spawn_link(Ping, :start, [])
     send ping, {:pong, self}
     assert_receive {:ping, ping}
