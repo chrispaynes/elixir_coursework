@@ -22,10 +22,20 @@ defmodule ElixseekerTest do
     assert String.ends_with?(result, filename)
   end
 
-@tag :skip
+# @tag :skip
   test "filter_by_extension only returns files with matching file extensions" do
-    assert Elixseeker.filter_by_extension(File.ls!, ".md") == ["README.md"]
-    refute Elixseeker.filter_by_extension(File.ls!, ".go") == ["README.md"]
+    file_name = "FOO_BAZ_BAR.hex"
+    test_file = File.touch!(file_name)
+
+    file_name2 = "ALPHABRAVO.txt"
+    test_file2 = File.touch!(file_name2)
+
+    assert Elixseeker.filter_by_extension(File.ls!, ".hex") == [file_name]
+    assert Elixseeker.filter_by_extension(File.ls!, ".txt") == [file_name2]
+    refute Elixseeker.filter_by_extension(File.ls!, ".java") == [file_name2]
+    
+    File.rm!(Path.relative_to_cwd(file_name))
+    File.rm!(Path.relative_to_cwd(file_name2))
   end
 
 @tag :skip
@@ -38,8 +48,8 @@ defmodule ElixseekerTest do
     assert Elixseeker.walk_directory(2) == []
   end
   
-# @tag :skip
-  test "indenter inputs the requested amount" do
+@tag :skip
+  test "indenter indents the requested number of times using the custom delimited" do
     assert Elixseeker.indenter(1, 0, "  ", "hello.txt") == "  hello.txt"
     assert Elixseeker.indenter(4, 0, "..", "world.txt") == "........world.txt"
     assert Elixseeker.indenter(3, 1, "\x26 ", "foobaz.txt") == "& & foobaz.txt"
