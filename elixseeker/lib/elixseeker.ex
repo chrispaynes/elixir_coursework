@@ -31,18 +31,19 @@ def opener(filepath) do
   System.cmd("open", [filepath])
 end
 
-  def indenter(depth, acc, delimiter, indent \\ "") do
-    result = IO.inspect indent
-    if acc < depth, do: indenter(depth, acc + 1, delimiter, indent <> delimiter), else: result
-  end
+def indenter(depth, acc, delimiter, value \\ "") do
+  result = IO.inspect(value)
+  if acc < depth, do: indenter(depth, acc + 1, delimiter, delimiter <> value), else: result
+end
 
 defp walk_directory(depth, dir \\ ".") do
   if depth != 0, do: IO.puts "Traversed #{depth} Level(s)\t#{Regex.replace(~r/\./, Path.expand(dir), "root")}"
 
+
   Enum.map(File.ls!(dir), fn file ->
   filename = "#{dir}/#{file}"
-  indentation = indenter(depth, 0, "\t")
-  # IO.inspect indenter(depth, 0, "\t")
+  indentation = indenter(depth, 0, "  ")
+  IO.inspect indenter(depth, 0, "  ")
     IO.puts "\t #{filename}"
     if File.dir?(filename), do: spawn_link fn -> walk_directory(depth + 1, filename) end
   end)
@@ -55,9 +56,4 @@ end
 # def print_walk_list(depth, dir) do # end
 # def track_search_time do end
 
-
-
-
-
-# Elixseeker.indenter(4, 0, "\t")
-Elixseeker.main
+# Elixseeker.main
