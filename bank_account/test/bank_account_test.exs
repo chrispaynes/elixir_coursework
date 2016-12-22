@@ -7,6 +7,7 @@ defmodule BankAccount do
     receive do
       {:check_balance, pid} -> get_balance(events, pid)
       {:deposit_into_account, amount} -> events = deposit_into_account(amount, events)
+      {:withdraw_from_account, amount} -> events = withdraw_from_account(amount, events)
     end
     await(events)
   end
@@ -16,16 +17,33 @@ defmodule BankAccount do
   end
 
   defp calculate_balance(events) do
-    deposits = sum(events)
-    deposits
+    deposits = sum(just_deposits(events))
+    withdrawls = sum(just_withdrawals(events))
+    deposits - withdrawls
+  end
+
+  defp just_type(events, expected_type) do
+    Enum.filter(events, fn({type, _}) -> type == expected_type end)
+  end
+
+  defp just_deposits(events) do
+    just_type(events, :deposit_into_account)
+  end
+
+  defp just_withdrawals(events) do
+    just_type(events, :withdraw_from_account)
   end
 
   defp sum(events) do
     Enum.reduce(events, 0, fn({_, amount}, acc) -> acc + amount end)
   end
 
-  def deposit_into_account(amount, events) do
+  defp deposit_into_account(amount, events) do
     IO.inspect events ++ [{:deposit_into_account, amount}]
+  end
+
+  defp withdraw_from_account(amount, events) do
+    IO.inspect events ++ [{:withdraw_from_account, amount}]
   end
 end
 
@@ -42,6 +60,13 @@ defmodule BankAccountTest do
     account = spawn_link(BankAccount, :start, [])
     send(account, {:deposit_into_account, 25})
     verify_balance_is 25, account
+  end
+
+  test "the bank account accepts a withdrawal" do
+    account = spawn_link(BankAccount, :start, [])
+    send(account, {:deposit_into_account, 25})
+    send(account, {:withdraw_from_account, 20})
+    verify_balance_is 5, account
   end
 
   def verify_balance_is(expected_balance, account) do
