@@ -8,7 +8,15 @@ defmodule FridgeServer do
   def handle_call({:store, food_item}, _, state) do
     {:reply, :ok, [food_item|state]}
   end
-
+  
+  def handle_call({:take, food_item}, _, state) do
+    case Enum.member?(state, food_item) do
+      true ->
+        {:reply, {:ok, food_item}, List.delete(state, food_item)}
+      false ->
+        {:reply, :not_found, state}
+    end
+  end
 end
 
 defmodule FridgeServerTest do
@@ -21,14 +29,12 @@ defmodule FridgeServerTest do
     assert :ok == :gen_server.call(fridge, {:store, :bacon})
   end
 
-  @tag :skip
   test "can remove items from the fridge" do
     {:ok, fridge} = :gen_server.start_link(FridgeServer, [], [])
     :gen_server.call(fridge, {:store, :bacon})
     assert {:ok, :bacon} == :gen_server.call(fridge, {:take, :bacon})
   end
 
-  @tag :skip
   test "cannot remove items from the fridge if they are not stored in the fridge" do
     {:ok, fridge} = :gen_server.start_link(FridgeServer, [], [])
     assert :not_found == :gen_server.call(fridge, {:take, :bacon})
