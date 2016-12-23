@@ -1,37 +1,38 @@
 defmodule BankAccount do
   def start do
-    await([])
+    await_events([])
   end
 
-  def await(events) do
+  def await_events(events, acc \\ 0) do
     receive do
-      {:check_balance, pid} -> get_balance(events, pid)
+      {:query_balance, pid} -> query_balance(events, pid)
       {:deposit_into_account, amount} -> events = deposit_into_account(amount, events)
       {:withdraw_from_account, amount} -> events = withdraw_from_account(amount, events)
     end
-    await(events)
+
+    await_events(events, acc + 1)
   end
 
-  def get_balance(events, pid) do
+  def query_balance(events, pid) do
     send(pid, {:balance, calculate_balance(events)})
   end
 
   defp calculate_balance(events) do
-    deposits = sum(just_deposits(events))
-    withdrawls = sum(just_withdrawals(events))
+    deposits = sum(deposit_events(events))
+    withdrawls = sum(withdrawal_events(events))
     deposits - withdrawls
   end
 
-  defp just_type(events, expected_type) do
-    Enum.filter(events, fn({type, _}) -> type == expected_type end)
+  defp filter_events(events, event_type) do
+    Enum.filter(events, fn({type, _}) -> type == event_type end)
   end
 
-  defp just_deposits(events) do
-    just_type(events, :deposit_into_account)
+  defp deposit_events(events) do
+    filter_events(events, :deposit_into_account)
   end
 
-  defp just_withdrawals(events) do
-    just_type(events, :withdraw_from_account)
+  defp withdrawal_events(events) do
+    filter_events(events, :withdraw_from_account)
   end
 
   defp sum(events) do
@@ -39,11 +40,11 @@ defmodule BankAccount do
   end
 
   defp deposit_into_account(amount, events) do
-    IO.inspect events ++ [{:deposit_into_account, amount}]
+    events ++ [{:deposit_into_account, amount}]
   end
 
   defp withdraw_from_account(amount, events) do
-    IO.inspect events ++ [{:withdraw_from_account, amount}]
+    events ++ [{:withdraw_from_account, amount}]
   end
 end
 
@@ -70,7 +71,7 @@ defmodule BankAccountTest do
   end
 
   def verify_balance_is(expected_balance, account) do
-    send(account, {:check_balance, self})
+    send(account, {:query_balance, self})
     assert_receive {:balance, ^expected_balance}
   end
 end
