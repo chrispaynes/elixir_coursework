@@ -1,9 +1,14 @@
 defmodule BankAccount do
   def start do
+    IO.puts "\n-----------------------------------------------------"
+    IO.puts "EVENT#\t\tACCOUNT BALANCE\t\tEVENT TYPE"
+    IO.puts "-----------------------------------------------------"
     await_events([])
   end
 
   def await_events(events, acc \\ 0) do
+    IO.puts Integer.to_string(acc) <> "\t\t" <> Integer.to_string calculate_balance(events)
+
     receive do
       {:query_balance, pid} -> query_balance(events, pid)
       {:deposit_into_account, amount} -> events = deposit_into_account(amount, events)
