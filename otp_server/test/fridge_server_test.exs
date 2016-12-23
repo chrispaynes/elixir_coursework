@@ -5,9 +5,17 @@ defmodule FridgeServer do
     {:ok, state}
   end
 
-  def start_link(_, state, options \\ []) do
+  def start_link(module, state, options \\ []) do
     {:ok, fridge} = :gen_server.start_link(__MODULE__, state, options)
     fridge
+  end
+
+  def store(server_ref, food_item) do
+    :gen_server.call(server_ref, {:store, food_item})
+  end
+
+  def take(server_ref, food_item) do
+    :gen_server.call(server_ref, {:take, food_item})
   end
 
   def handle_call({:store, food_item}, _, state) do
@@ -28,18 +36,18 @@ defmodule FridgeServerTest do
   use ExUnit.Case, async: true
 
   test "the fridge accepts food" do
-    fridge = FridgeServer.start_link(FridgeServer, [])
-    assert :ok == :gen_server.call(fridge, {:store, :bacon})
+    fridge = FridgeServer.start_link(__MODULE__, [])
+    assert :ok == FridgeServer.store(fridge, :bacon) 
   end
 
   test "can remove items from the fridge" do
-    fridge = FridgeServer.start_link(FridgeServer, [])
-    :gen_server.call(fridge, {:store, :bacon})
-    assert {:ok, :bacon} == :gen_server.call(fridge, {:take, :bacon})
+    fridge = FridgeServer.start_link(__MODULE__, [])
+    FridgeServer.store(fridge, :bacon)
+    assert {:ok, :bacon} == FridgeServer.take(fridge, :bacon)
   end
 
   test "cannot remove items from the fridge if they are not stored in the fridge" do
-    fridge = FridgeServer.start_link(FridgeServer, [])
-    assert :not_found == :gen_server.call(fridge, {:take, :bacon})
+    fridge = FridgeServer.start_link(__MODULE__, [])
+    assert :not_found == FridgeServer.take(fridge, :bacon)
   end
 end
