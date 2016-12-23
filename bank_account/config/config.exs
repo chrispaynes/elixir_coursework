@@ -11,6 +11,15 @@ use Mix.Config
 # You can configure for your application as:
 #
 #     config :bank_account, key: :value
+  config :bank_account, ecto_repos: [BankAccount.Repo]
+
+  config :bank_account, BankAccount.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "bank_account",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  port: "5432"
 #
 # And access this configuration in your application as:
 #
