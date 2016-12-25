@@ -8,6 +8,21 @@ defmodule OtpZeldacatTest do
     assert HealthComponent.get_hp(entity) == 100
   end
 
+  test "an entity knows if it is alive" do 
+    {:ok, entity} = Entity.init()
+    Entity.add_component(entity, HealthComponent, 100)
+    assert HealthComponent.get_hp(entity) == 100
+    assert HealthComponent.alive?(entity) == true
+  end
+
+  @tag :skip
+  test "an entity is notified when hit" do 
+    {:ok, entity} = Entity.init()
+    Entity.add_component(entity, HealthComponent, 100)
+    assert HealthComponent.get_hp(entity) == 100
+    assert Entity.notify(entity, {:hit, 50}) == {:ok}
+  end
+  
   @tag :skip
   test "an entity loses HP when hit" do
     {:ok, entity} = Entity.init()
