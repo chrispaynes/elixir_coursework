@@ -75,10 +75,21 @@ defmodule OtpZeldacatTest do
     assert XYComponent.get_position(entity) == {50, 50}
   end
 
-  test "something with an XYComponent can move around" do
+  test "an entity with an XYComponent can move around" do
     {:ok, entity} = Entity.init()
     Entity.add_component(entity, XYComponent, {50,50})
     Entity.notify(entity, {:move, {:y, 35}})
-    assert XYComponent.get_position(entity) == {50, 35}
+    Entity.notify(entity, {:move, {:x, 10}})
+    assert XYComponent.get_position(entity) == {10, 35}
+  end
+
+  test "an entity with a WeaponsComponent can manage a weapons list" do
+    {:ok, entity} = Entity.init()
+    Entity.add_component(entity, WeaponsComponent, "Buster Sword")
+    Entity.notify(entity, {:add_weapon, "Mythril Saber"}) 
+    assert WeaponsComponent.list_weapons(entity) == ["Buster Sword", "Mythril Saber"]
+    Entity.notify(entity, {:add_weapon, "Rune Blade"}) 
+    Entity.notify(entity, {:add_weapon, "Heaven's Cloud"}) 
+    assert WeaponsComponent.list_weapons(entity) == ["Buster Sword", "Mythril Saber", "Rune Blade", "Heaven's Cloud"]
   end
 end
