@@ -5,7 +5,8 @@ defmodule Entity do
     GenEvent.start_link
   end
 
-  def notify(pid, event) do
+  def notify(manager, event) do
+    GenEvent.notify(manager, event)
   end
 
   def add_component(manager, handler, args) do

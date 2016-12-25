@@ -10,7 +10,6 @@ defmodule HealthComponent do
   end
 
   def alive?(manager) do
-    IO.inspect manager
     GenEvent.call(manager, HealthComponent, :alive?)
   end
 
@@ -21,6 +20,10 @@ defmodule HealthComponent do
 
   def handle_call(:alive?, hp) do
     {:ok, hp > 0, hp}
+  end
+
+  def handle_event({:hit, damage}, hp) do
+    {:ok, hp - damage}
   end
 
 end
