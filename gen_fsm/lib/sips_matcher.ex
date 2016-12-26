@@ -1,6 +1,6 @@
 defmodule SipsMatcher do
   use GenStateMachine
-  
+
   def init(state) do
     {:ok, [:starting|state], []}
   end
@@ -30,12 +30,12 @@ defmodule SipsMatcher do
         {:keep_state_and_data, [{:reply, from, :got_s}]}
     end
   end
-  
+
   def handle_event({:call, from}, :i, state, data) do
     cond do
       hd(state) == :got_s ->
         {:next_state, [:got_si|state], data, [{:reply, from, :got_i}]}
-      hd(state) == :got_sips ->
+      hd(state) == :got_sips or Enum.count(state) >= 3 ->
         {:keep_state_and_data, [{:reply, from, hd(state)}]}
       hd(state) != :got_s ->
         {:keep_state_and_data, [{:reply, from, :got_i}]}
@@ -46,11 +46,11 @@ defmodule SipsMatcher do
     cond do
       hd(state) == :got_si ->
         {:next_state, [:got_sip|state], data, [{:reply, from, :got_p}]}
-      hd(state) == :got_sips ->
+      hd(state) == :got_sips or Enum.count(state) >= 4  ->
         {:keep_state_and_data, [{:reply, from, hd(state)}]}
       hd(state) != :got_si ->
         {:keep_state_and_data, [{:reply, from, :got_p}]}
-    end    
+    end
   end
 
   def handle_event({:call, from}, :no_match, state, _data) do
