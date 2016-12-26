@@ -1,24 +1,78 @@
 # BankAccount
 
-**TODO: Add description**
+A stateful Bank Account model. Allows for creating, depositing, withdrawing, and balance_quering of a stateful bank account. Created based on a [Josh Adams/DailyDrip.com](https://www.dailydrip.com) video.
 
-## Installation
+##Todo
+* Persist event log to Postgres
+* Add ability to rewind/replay events
+* Create a CSV document of Account Log
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+## Features
+* Atoms
+* Command-Query Responsibility Segregation
+* Event Filtering
+* Event Sourcing
+* Infinite Recursion
+* Persisting State
+* PID's
+* Process Spawning
+* Sending and Receiving Messages
 
-  1. Add `bank_account` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:bank_account, "~> 0.1.0"}]
-    end
-    ```
+## Usage
+Use the Mix build tool to get all out of date or missing dependencies.
+```
+    $ mix deps.get
+      Running dependency resolution
+      ...
+```
 
-  2. Ensure `bank_account` is started before your application:
+Use the Mix build tool to compile the app and start an iex session inside the project.
+```
+    $ mix compile
+    Generated bank_account app
 
-    ```elixir
-    def application do
-      [applications: [:bank_account]]
-    end
-    ```
+    $ iex -S mix
+    Interactive Elixir (x.x.x) ...
+    iex(1)>
+```
 
+Create a new Bank Account within the IEX shell and send (:query_balance, :deposit_into_account, and :withdraw_from_account) messages to the account.
+```   
+    iex(1)> account = spawn_link(BankAccount, :start, [])
+    -----------------------------------------------------
+    EVENT#          ACCOUNT BALANCE         EVENT TYPE
+    -----------------------------------------------------
+    0               0
+    
+    #PID<0.167.0>
+    
+    iex(2)> send(account, {:query_balance, self})
+    -----------------------------------------------------
+    EVENT#          ACCOUNT BALANCE         EVENT TYPE
+    -----------------------------------------------------
+    1               0  
+    
+    {:query_balance, #PID<0.176.0>}
+    
+    iex(3)> send(account, {:deposit_into_account, 25})
+    -----------------------------------------------------
+    EVENT#          ACCOUNT BALANCE         EVENT TYPE
+    -----------------------------------------------------
+    2               25  
+    
+    {:deposit_into_account, 25}
+  
+    iex(4)> send(account, {:withdraw_from_account, 20})
+    -----------------------------------------------------
+    EVENT#          ACCOUNT BALANCE         EVENT TYPE
+    -----------------------------------------------------
+    3               5  
+    
+    {:withdraw_from_account, 20}
+```
+
+## Running Tests
+ * <b>[Elixir Kernel.ExUnit](https://github.com/elixir-lang/elixir):</b>
+Unit testing framework for Elixir.<br> 
+   ``` $ mix test ```
