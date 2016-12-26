@@ -3,7 +3,7 @@
 ## About
 A collection of Elixir challenges and exercises accompanied by ExUnit tests. Challenges were sourced from
 [FreeCodeCamp](https://www.freecodecamp.com), [Exercism.IO](http://exercism.io),
-[Josh Adams of DailyDrip.com](www.dailydrip.com) and [Codewars](https://www.codewars.com).
+[Josh Adams of DailyDrip.com](https://www.dailydrip.com) and [Codewars](https://www.codewars.com).
 * Each Elixir Module file within "lib/src" contains code that solves a coding challenge.
 * Each Elixir Module file within "test/src" contains an ExUnit test file to verify module outputs.
 
