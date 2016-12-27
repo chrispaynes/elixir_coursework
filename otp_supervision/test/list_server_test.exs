@@ -11,16 +11,15 @@ defmodule ListServerTest do
     assert Enum.empty?(ListServer.items) == true
   end
 
-  @tag :skip
   test "items can be added to the list server" do
-    ListServer.add('book') 
-    assert ListServer.items == ['book']
+    ListServer.add("book") 
+    assert ListServer.items == ["book"]
   end
 
-  @tag :skip
   test "items can be removed from the list server" do
-    ListServer.add('book') 
-    ListServer.remove('book') 
+    ListServer.add("book") 
+    ListServer.remove("book") 
     assert ListServer.items == [] 
   end
+
 end
