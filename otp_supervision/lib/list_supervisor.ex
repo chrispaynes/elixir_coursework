@@ -2,12 +2,18 @@ defmodule ListSupervisor do
   import Supervisor.Spec
 
   def start_link do
-    :supervisor.start_link(__MODULE__, [])
+    result = {:ok, sup} = :supervisor.start_link(__MODULE__, [])
+    start_workers(sup)
+    result
   end
 
-  def init(state) do
-    children = [worker(ListServer, state)]
-    supervise(children, strategy: :one_for_one)
+  def start_workers(supervisor) do
+    {:ok, state} = :supervisor.start_child(supervisor, worker(StateData, []))
+    :supervisor.start_child(supervisor, worker(ListSubSupervisor, [state]))
+  end
+
+  def init(_) do
+    supervise([], strategy: :one_for_one)
   end
 
 end

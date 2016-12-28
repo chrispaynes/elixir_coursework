@@ -5,9 +5,10 @@ Basic OTP Process Supervision. Created based on a [Josh Adams/DailyDrip.com](htt
 
 ## Features
 * Asynchronous GenServer Casts
+* Building Supervision Trees
+* Fault-Tolerant State Persistence
 * Handling GenServer Casts and Calls
 * OTP Supervision
-* State Persistence
 * Synchronous GenServer Calls
 
 ## Usage
@@ -100,7 +101,7 @@ Use the ListSupervisor to create a new ListServer within the IEX shell and add a
     nil
     
     iex(8)> ListServer.items
-    []
+    ["Otis"]
 ```
 
 ## Running Tests
