@@ -1,0 +1,2 @@
+defmodule EctoPersistence do
+end
