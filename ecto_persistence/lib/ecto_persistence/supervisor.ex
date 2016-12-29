@@ -7,7 +7,7 @@ defmodule EctoPersistence.Supervisor do
 
   def init([]) do
     children = [ worker(EctoPersistence.Repo, []) ]
-    {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
+    supervise(children, strategy: :one_for_one)
   end
 
 end
