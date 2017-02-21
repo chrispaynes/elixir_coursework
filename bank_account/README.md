@@ -2,7 +2,7 @@
 
 A stateful Bank Account model. Allows for creating, depositing, withdrawing, and balance_quering of a stateful bank account. Created based on a [Josh Adams/DailyDrip.com](https://www.dailydrip.com) video.
 
-##Todo
+## Todo
 * Persist event log to Postgres
 * Add ability to rewind/replay events
 * Create a CSV document of Account Log
@@ -18,8 +18,17 @@ A stateful Bank Account model. Allows for creating, depositing, withdrawing, and
 * Process Spawning
 * Sending and Receiving Messages
 
-
 ## Usage
+* Start the PostgreSQL Server
+* Configure your PostgreSQL Username, Password and Port in `./config/config.exs`
+* Create the application's PostgreSQL Database
+```
+    $ mix ecto.create -r BankAccount.Repo
+
+    Generated bank_account app
+    The database for BankAccount.Repo has been created
+```
+
 Use the Mix build tool to get all out of date or missing dependencies.
 ```
     $ mix deps.get

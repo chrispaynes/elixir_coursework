@@ -1,5 +1,8 @@
 defmodule BankAccount do
-  def start do
+  use Application
+
+  def start(_type, _args) do
+    BankAccount.Supervisor.start_link
     await_events([])
   end
 
@@ -51,5 +54,6 @@ defmodule BankAccount do
   defp withdraw_from_account(amount, events) do
     events ++ [{:withdraw_from_account, amount}]
   end
+
 end
 
