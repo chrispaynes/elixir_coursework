@@ -48,7 +48,7 @@ Use the Mix build tool to compile the app and start an iex session inside the pr
 
 Create a new Bank Account within the IEX shell and send (:query_balance, :deposit_into_account, and :withdraw_from_account) messages to the account.
 ```   
-    iex(1)> account = spawn_link(BankAccount, :start, [])
+    iex(1)> account = spawn_link(BankAccount, :start, [0,0])
     -----------------------------------------------------
     EVENT#          ACCOUNT BALANCE         EVENT TYPE
     -----------------------------------------------------
