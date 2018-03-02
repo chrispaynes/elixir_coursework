@@ -30,10 +30,10 @@ defmodule ElixseekerTest do
     file_name2 = "ALPHABRAVO.txt"
     test_file2 = File.touch!(file_name2)
 
-    assert Elixseeker.filter_by_extension(File.ls!, ".hex") == [file_name]
-    assert Elixseeker.filter_by_extension(File.ls!, ".txt") == [file_name2]
-    refute Elixseeker.filter_by_extension(File.ls!, ".java") == [file_name2]
-    
+    assert Elixseeker.filter_by_extension(File.ls!(), ".hex") == [file_name]
+    assert Elixseeker.filter_by_extension(File.ls!(), ".txt") == [file_name2]
+    refute Elixseeker.filter_by_extension(File.ls!(), ".java") == [file_name2]
+
     File.rm!(Path.relative_to_cwd(file_name))
     File.rm!(Path.relative_to_cwd(file_name2))
   end
@@ -43,24 +43,23 @@ defmodule ElixseekerTest do
     assert Elixseeker.opener("README.md") == {"", 0}
   end
 
-  #@tag :skip
+  # @tag :skip
   test "it recursively walks a directory" do
-    assert (spawn_link fn -> Elixseeker.walk_directory(2) end) == []
+    assert spawn_link(fn -> Elixseeker.walk_directory(2) end) == []
   end
 
   @tag :skip
   test "walk_directory() spawns processes" do
-    walk = Elixseeker.walk_directory(2);
-    assert Enum.any?(walk, fn(elem) -> is_pid(elem) == true end) == true
+    walk = Elixseeker.walk_directory(2)
+    assert Enum.any?(walk, fn elem -> is_pid(elem) == true end) == true
   end
-  
+
   @tag :skip
   test "indenter indents the requested number of times using the custom delimited" do
     assert Elixseeker.indenter(1, 0, "  ", "hello.txt") == "  hello.txt"
     assert Elixseeker.indenter(4, 0, "..", "world.txt") == "........world.txt"
     assert Elixseeker.indenter(3, 1, "\x26 ", "foobaz.txt") == "& & foobaz.txt"
   end
-
 end
 
 # TODO
