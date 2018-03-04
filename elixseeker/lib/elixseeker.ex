@@ -1,5 +1,8 @@
 defmodule Elixseeker do
   @root String.trim_trailing(Path.absname("."), ".")
+  # allow for testing private functions
+  @compile if Mix.env() == :test, do: :export_all
+
   @doc """
   start starts the search process
   """
@@ -16,7 +19,7 @@ defmodule Elixseeker do
 
     case Task.yield(task, 30000) || Task.shutdown(task) do
       {:ok, {time, _}} ->
-        IO.puts("\nSearch Duration: #{Float.round((time * 0.001), 2)} Milliseconds!")
+        IO.puts("\nSearch Duration: #{Float.round(time * 0.001, 2)} Milliseconds!")
 
       _ ->
         nil
@@ -89,7 +92,7 @@ defmodule Elixseeker do
 
   # indent indents the stdout text
   defp indent(depth, acc, indentation_symbol, output_text) do
-    if acc < depth,
+    if is_number(acc) and acc > -1 and acc < depth,
       do: indent(depth, acc + 1, indentation_symbol, "#{indentation_symbol}#{output_text}"),
       else: output_text
   end
