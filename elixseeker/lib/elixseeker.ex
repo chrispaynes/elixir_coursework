@@ -12,9 +12,15 @@ defmodule Elixseeker do
     ==============================
     """)
 
-    {time, _} = :timer.tc(fn -> search() end)
+    task = Task.async(fn -> :timer.tc(fn -> search() end) end)
 
-    IO.puts("\nSearch Duration: #{time} Microseconds!")
+    case Task.yield(task, 30000) || Task.shutdown(task) do
+      {:ok, {time, _}} ->
+        IO.puts("\nSearch Duration: #{Float.round((time * 0.001), 2)} Milliseconds!")
+
+      _ ->
+        nil
+    end
   end
 
   # get_search_root determines where to begin the file search
@@ -88,18 +94,27 @@ defmodule Elixseeker do
       else: output_text
   end
 
+  defp strip_path_prefix(prefixs, filepath) do
+    filepath
+    |> Path.relative_to_cwd()
+    |> Path.split()
+    |> Enum.drop(prefixs)
+  end
+
   # format_filename prints a filename to stdout
   defp format_filename(current_depth, filepath) do
-    filename =
-      filepath
-      |> Path.relative_to_cwd()
-      |> Path.split()
-      |> Enum.drop(current_depth)
-      |> Path.join()
+    try do
+      filepath = strip_path_prefix(current_depth, filepath) |> Path.join()
 
-    indent = indent(current_depth, 0, "  ", "")
+      indent = indent(current_depth, 0, "  ", "")
 
-    if filepath |> File.dir?(), do: "#{indent}#{filename}/", else: "#{indent}#{filename}"
+      filename_output =
+        if filepath |> File.dir?(), do: "#{indent}#{filepath}/", else: "#{indent}#{filepath}"
+
+      IO.puts(filename_output)
+    rescue
+      FunctionClauseError -> nil
+    end
   end
 
   # walk_directory walks a directory structure
@@ -107,7 +122,7 @@ defmodule Elixseeker do
     Enum.map(File.ls!(dir), fn file ->
       filepath = "#{dir}/#{file}" |> Path.expand()
 
-      IO.puts("#{format_filename(current_depth, filepath)}")
+      format_filename(current_depth, filepath)
 
       if String.contains?(file |> String.downcase(), match |> String.downcase()) and
            File.exists?(match),
