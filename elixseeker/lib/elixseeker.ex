@@ -33,10 +33,7 @@ defmodule Elixseeker do
     try do
       depth_int = depth |> String.to_integer()
 
-      case depth_int do
-        depth_int when depth_int > 0 -> depth_int
-        _ -> default_depth
-      end
+      if depth_int > 0, do: depth_int, else: default_depth
     rescue
       ArgumentError -> default_depth
     end
@@ -108,11 +105,13 @@ defmodule Elixseeker do
   # walk_directory walks a directory structure
   defp walk_directory(max_depth, current_depth, dir, match) do
     Enum.map(File.ls!(dir), fn file ->
-      filepath = "#{dir}/#{file}"
+      filepath = "#{dir}/#{file}" |> Path.expand()
 
       IO.puts("#{format_filename(current_depth, filepath)}")
 
-      if String.contains?(filepath, match), do: open(match)
+      if String.contains?(file |> String.downcase(), match |> String.downcase()) and
+           File.exists?(match),
+         do: open(match)
 
       if File.dir?(filepath) and current_depth < max_depth,
         do: walk_directory(max_depth, current_depth + 1, filepath, match)
