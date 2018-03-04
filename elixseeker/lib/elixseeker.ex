@@ -1,70 +1,121 @@
 defmodule Elixseeker do
+  @root String.trim_trailing(Path.absname("."), ".")
+  @doc """
+  start starts the search process
+  """
   def start() do
-    IO.puts("Welcome to Elixseeker!")
-    IO.puts("Starting Process")
-    IO.puts("======================")
-    IO.puts("Searching Root Directory:\t" <> String.trim_trailing(Path.absname("."), "."))
-    IO.puts("")
-    {time, _} = :timer.tc(fn -> search end)
-    IO.puts("Search duration: #{IO.inspect(time)} Microseconds!")
+    System.cmd("clear", [])
+
+    IO.puts("""
+    ==============================
+            ElixSeeker CLI
+    ==============================
+    """)
+
+    {time, _} = :timer.tc(fn -> search() end)
+
+    IO.puts("\nSearch Duration: #{time} Microseconds!")
   end
 
-  def search() do
-    # add pattern matching for specific directories
-    filematch = Mix.Shell.IO.prompt("Which file are you looking for?")
-    max_depth = Mix.Shell.IO.prompt("How many directories deep do you wish to search?")
-    search_location = Mix.Shell.IO.prompt("Which directory would you like to search?")
+  # get_search_root determines where to begin the file search
+  defp get_search_root() do
+    Mix.Shell.IO.prompt("\nWhich directory would you like to search?\n(Default:#{@root}")
+    |> String.trim()
+    |> Path.expand()
+  end
+
+  # set_search_depth determines how many directories deep to conduct the search
+  defp set_search_depth(default_depth) do
+    depth =
+      Mix.Shell.IO.prompt("How many directories deep do you wish to search? ")
+      |> String.trim()
+
+    try do
+      depth_int = depth |> String.to_integer()
+
+      case depth_int do
+        depth_int when depth_int > 0 -> depth_int
+        _ -> default_depth
+      end
+    rescue
+      ArgumentError -> default_depth
+    end
+  end
+
+  # set_query determines which file to search for
+  defp set_query() do
+    Mix.Shell.IO.prompt("\nWhich file are you looking for?")
+    |> String.trim()
+  end
+
+  # search searches a directory structure for a file
+  defp search() do
+    max_depth = set_search_depth(1)
+    current_depth = 0
+    root = get_search_root()
+    query = set_query()
+
+    IO.puts("Searching #{root} #{max_depth} level(s) deep for #{query}")
 
     spawn_link(fn ->
       Enum.map(
         walk_directory(
-          String.to_integer(String.trim(max_depth)),
-          0,
-          ("" <> search_location) |> String.trim(),
-          String.trim(filematch)
+          max_depth,
+          current_depth,
+          root,
+          query
         ),
-        fn x -> IO.inspect(x) end
+        fn x -> x end
       )
     end)
   end
 
-  def source(directory) when is_bitstring(directory) do
-    IO.puts("Now searching #{IO.inspect(Path.expand(directory))}")
-    File.dir?(directory)
+  # open opens a file
+  defp open(filepath) do
+    case :os.type() do
+      {:unix, :linux} ->
+        System.cmd("xdg-open", [filepath])
+
+      {:unix, :darwin} ->
+        System.cmd("open", [filepath])
+
+      {:win32, :nt} ->
+        System.cmd(filepath, [])
+    end
   end
 
-  def filter_by_extension(collection, ext) do
-    Enum.filter(collection, fn x -> Path.extname(x) == ext end)
+  # indent indents the stdout text
+  defp indent(depth, acc, indentation_symbol, output_text) do
+    if acc < depth,
+      do: indent(depth, acc + 1, indentation_symbol, "#{indentation_symbol}#{output_text}"),
+      else: output_text
   end
 
-  def search_filename(filepath) when is_bitstring(filepath) do
-    if File.exists?(filepath), do: Path.expand(filepath)
+  # format_filename prints a filename to stdout
+  defp format_filename(current_depth, filepath) do
+    filename =
+      filepath
+      |> Path.relative_to_cwd()
+      |> Path.split()
+      |> Enum.drop(current_depth)
+      |> Path.join()
+
+    indent = indent(current_depth, 0, "  ", "")
+
+    if filepath |> File.dir?(), do: "#{indent}#{filename}/", else: "#{indent}#{filename}"
   end
 
-  def open(filepath) do
-    System.cmd("xdg-open", [filepath])
-  end
-
-  def indent(depth, acc, delimiter, value \\ "") do
-    if acc < depth, do: indent(depth, acc + 1, delimiter, delimiter <> value), else: value
-  end
-
-  def walk_directory(max_depth, depth \\ 0, dir \\ ".", match) do
-    IO.puts(
-      "\nTRAVERSED #{depth} LEVEL(S) WITHIN #{
-        Regex.replace(~r/\./, Path.relative_to_cwd(dir), "")
-      }" <> "\n-------------------------------------------------------------"
-    )
-
+  # walk_directory walks a directory structure
+  defp walk_directory(max_depth, current_depth, dir, match) do
     Enum.map(File.ls!(dir), fn file ->
-      filename = "#{dir}/#{file}"
-      IO.puts(indent(depth, 0, "..") <> Regex.replace(~r/^\./, Path.absname(filename), ""))
-      if String.contains?(filename, match), do: open(filename)
+      filepath = "#{dir}/#{file}"
 
-      if File.dir?(filename) and depth < max_depth,
-        do: walk_directory(max_depth, depth + 1, filename, match)
+      IO.puts("#{format_filename(current_depth, filepath)}")
+
+      if String.contains?(filepath, match), do: open(match)
+
+      if File.dir?(filepath) and current_depth < max_depth,
+        do: walk_directory(max_depth, current_depth + 1, filepath, match)
     end)
   end
 end
-
-Elixseeker.start()

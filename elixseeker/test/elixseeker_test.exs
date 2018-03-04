@@ -43,7 +43,7 @@ defmodule ElixseekerTest do
     assert Elixseeker.opener("README.md") == {"", 0}
   end
 
-  # @tag :skip
+  @tag :skip
   test "it recursively walks a directory" do
     assert spawn_link(fn -> Elixseeker.walk_directory(2) end) == []
   end
